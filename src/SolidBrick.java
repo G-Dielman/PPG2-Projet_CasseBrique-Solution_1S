@@ -6,7 +6,9 @@ public class SolidBrick  extends Brick{
     private static Color DEFAUT_COLOR = Color.DARKGREEN;
 
     public SolidBrick(double x, double y, double with, double height) {
+
         super(x, y, with, height,  DEFAUT_COLOR);
+        setPoints(50);
     }
 
     @Override

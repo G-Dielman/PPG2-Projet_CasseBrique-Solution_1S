@@ -5,7 +5,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
@@ -16,6 +15,7 @@ import java.util.Random;
 public class BreakoutGame extends Application {
 
     private AnimationTimer timer;
+    private int score = 0;
     @Override
     public void start(Stage primaryStage) {
         Pane root = new Pane();
@@ -63,7 +63,7 @@ public class BreakoutGame extends Application {
 
                 // Vérifier si la balle tombe sous la raquette
                 if (ball.getY() > scene.getHeight()) {
-                    stopGame("Game Over!", root);
+                    stopGame("Game Over with "+ score +" points!!!", root);
                 }
 
                 // Collision avec la raquette
@@ -76,24 +76,26 @@ public class BreakoutGame extends Application {
                 for (Brick brick : bricks){
                     if ( !brick.isBroken() ){
                         allBrickBroken = false;
-                        if ( brick.collideWith(ball) )
+                        if ( brick.collideWith(ball) ){
                             brick.onCollisionWith(ball);
+                            score += brick.getPoints();
+                        }
                     }
                 }
                 if(allBrickBroken)
-                    stopGame("YOU WIN !!!", root);
+                    stopGame("YOU WIN  with "+ score +" points!!!", root);
             }
         };
 
         this.timer.start(); // Démarrer l'animation
 
-        primaryStage.setTitle("Casse-briques - Itération 2");
+        primaryStage.setTitle("Casse-briques - Session 1");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     public static Brick[] createBricks(Pane root, Scene scene){
-        int nbBrique = 20;
+        int nbBrique = 50;
         double space = 2;
         int BriquesParLigne = 8;
         double longueurBrique = scene.getWidth()/BriquesParLigne - space ;
@@ -106,15 +108,17 @@ public class BreakoutGame extends Application {
                 int idx = row * BriquesParLigne + colum;
                 //Determine si la brique courante sera une brique normale ou une brique solide
                 Random r = new Random();
-                int random = r.nextInt(0,2);
+                int random = r.nextInt(0,4);
                 Brick brickToAdd;
                 if(random == 0)
-                    brickToAdd = new NormalBrick(colum * longueurBrique + colum * space + space/2, row * hauteurBrique + row *space,longueurBrique,hauteurBrique);
-                else
                     brickToAdd = new SolidBrick(colum * longueurBrique + colum * space + space/2, row * hauteurBrique + row *space,longueurBrique,hauteurBrique);
+                else if(random == 1)
+                    brickToAdd = new BonusBrick(colum * longueurBrique + colum * space + space/2, row * hauteurBrique + row *space,longueurBrique,hauteurBrique);
+                else
+                    brickToAdd = new NormalBrick(colum * longueurBrique + colum * space + space/2, row * hauteurBrique + row *space,longueurBrique,hauteurBrique);
 
-                random = r.nextInt(0,3);
-                if(random <2)
+
+                if( r.nextBoolean() )
                     brickToAdd.breakThis();
 
                 bricks[idx] = brickToAdd; // Ajoute la brique au tableau
